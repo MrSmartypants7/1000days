@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1,000 Days of Us: Relationship Rating</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        header {
+            background-color: #ff6f61;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .question h3 {
+            margin: 0 0 10px;
+        }
+        .rating {
+            display: flex;
+            gap: 10px;
+        }
+        .rating label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .rating input {
+            display: none;
+        }
+        .rating span {
+            background-color: #ddd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .rating input:checked + span {
+            background-color: #ff6f61;
+            color: white;
+        }
+        .submit-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #ff6f61;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #e65b54;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .results h2 {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>1,000 Days of HARE</h1>
+        <p>Please Rate Our Journey Together</p>
+    </header>
+    <main>
+        <div id="questionContainer">
+            <!-- Questions will be dynamically added here -->
+        </div>
+        <div id="results" class="results" style="display: none;">
+            <h2>Your Ratings</h2>
+            <p id="resultsContent"></p>
+            <h3 id="averageRating"></h3>
+            <p id="conclusion"></p>
+        </div>
+        <button id="nextQuestionBtn" class="submit-btn" style="display: none;">Next</button>
+    </main>
+
+    <script>
+        const questions = [
+            { id: 'q1', text: 'How would you rate my sense of humor? (I am obv the funnier of the two)' },
+            { id: 'q2', text: 'How dramatic am I on a scale of 1 to Bollywood? (Need to watch more Bolly with you btw)' },
+            { id: 'q3', text: 'Rate my ability to gift (I try)' },
+            { id: 'q4', text: 'On a scale of 1 to 10, how good am I at remembering important dates?' },
+            { id: 'q5', text: 'How would you rate my cooking skills? (Also Egg Fried Rice? or Pasta and Tots??)' },
+            { id: 'transition', text: 'Okayyyy, now onto the important questions!' },
+            { id: 'q6', text: 'On a scale of 1 to 10, how well do you think I understand your love language? ❤️(More on this later)' },
+            { id: 'q7', text: 'How would you rate our communication as a couple? 🗣️' },
+            { id: 'q8', text: 'On a scale of 1 to 10, how supported do you feel by me in tough times? 🤗' },
+            { id: 'q9', text: 'How confident are you in our ability to handle challenges together? 💪' },
+            { id: 'q10', text: 'How often do you feel appreciated by me on a scale of 1 to 10? 🥰' },
+            { id: 'q11', text: 'TRUST, How often do I trust your opnions/advices?' },
+            { id: 'q12', text: 'On a scale of 1 to 10, how is the overall weinering service experience? 🍆' },
+            { id: 'transitionLoveLanguages', text: 'Now, let’s explore the 5 Love Languages. Please give performance review' },
+            { id: 'q14', text: 'Words of Affirmation: How well have I expressed my love through kind words and compliments over these 1,000 days?' },
+            { id: 'q15', text: 'Quality Time: How well have I prioritized spending meaningful and uninterrupted time with you?' },
+            { id: 'q16', text: 'Receiving Gifts: How thoughtful and meaningful have my gifts been over these 1,000 days?' },
+            { id: 'q17', text: 'Acts of Service: How well have I helped you by performing tasks that make your life easier?' },
+            { id: 'q18', text: 'Physical Touch: How well have I shown love through physical affection over these 1,000 days?' }
+        ];
+
+        let currentQuestionIndex = 0;
+        const ratings = {};
+
+        const questionContainer = document.getElementById('questionContainer');
+        const resultsDiv = document.getElementById('results');
+        const resultsContent = document.getElementById('resultsContent');
+        const averageRatingDisplay = document.getElementById('averageRating');
+        const conclusion = document.getElementById('conclusion');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+
+        function loadQuestion(index) {
+            const question = questions[index];
+
+            if (question.id === 'transition' || question.id === 'transitionLoveLanguages') {
+                questionContainer.innerHTML = `
+                    <div class="question">
+                        <h3>${question.text}</h3>
+                    </div>
+                `;
+                nextQuestionBtn.style.display = 'block';
+                return;
+            }
+
+            questionContainer.innerHTML = `
+                <div class="question">
+                    <h3>${question.text}</h3>
+                    <div class="rating">
+                        ${Array.from({ length: 10 }, (_, i) => `
+                            <label>
+                                <input type="radio" name="${question.id}" value="${i + 1}">
+                                <span>${i + 1}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            nextQuestionBtn.style.display = 'block';
+        }
+
+        function calculateAverage(ratings) {
+            const total = Object.values(ratings).reduce((sum, value) => sum + parseInt(value), 0);
+            return (total / Object.keys(ratings).length).toFixed(2);
+        }
+
+        function showResults() {
+            questionContainer.innerHTML = '';
+            nextQuestionBtn.style.display = 'none';
+            resultsDiv.style.display = 'block';
+
+            resultsContent.innerHTML = Object.entries(ratings)
+                .map(([key, value]) => `<strong>${questions.find(q => q.id === key).text}</strong>: ${value}/10<br>`)
+                .join('');
+
+            const averageRating = calculateAverage(ratings);
+            averageRatingDisplay.innerHTML = `Average Rating: ${averageRating}/10`;
+
+            conclusion.innerHTML = averageRating >= 7
+                ? 'Wow dear, you’ve got yourself a keeper! Your boyfriend is performing above average—great signs for the future. Congrats, hehe! 🎉'
+                : 'Looks like there’s room for growth! Relationships are all about learning and improving together.🌟';
+        }
+
+        nextQuestionBtn.addEventListener('click', () => {
+            const currentQuestion = questions[currentQuestionIndex];
+
+            if (currentQuestion.id !== 'transition' && currentQuestion.id !== 'transitionLoveLanguages') {
+                const selectedRating = document.querySelector(`input[name="${currentQuestion.id}"]:checked`);
+                if (!selectedRating) {
+                    alert('Please select a rating before proceeding!');
+                    return;
+                }
+                ratings[currentQuestion.id] = selectedRating.value;
+            }
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showResults();
+            }
+        });
+
+        // Load the first question initially
+        loadQuestion(currentQuestionIndex);
+    </script>
+</body>
+</html>
